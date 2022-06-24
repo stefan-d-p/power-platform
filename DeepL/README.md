@@ -1,6 +1,8 @@
 # DeepL Translate Connector
 DeepL is an online service and API for translating text and documents into more than 25 languages.
 
+> This is an **unoffical DeepL custom connector**. Iam not affiliated with DeepL.
+
 # Prerequisites
 
 * A Microsoft Power Apps or Power Automate plan with custom connector feature
@@ -31,3 +33,12 @@ Downloads a translated document once translation has finished
 ### GetLanguages
 
 Retrieves supported languages by DeepL, either used as source language or target language. This operation is also used to dynamically populate the input parameters for TranslateText and TranslateDocumentRequest.
+
+
+# Credentials
+
+The connection item requires your DeepL Authentication Key. You can retrieve your key from your DeepL account page.
+
+# Getting started
+
+Visit the official [DeepL API documentation](https://www.deepl.com/docs-api) for further details on the various actions and parameters.
