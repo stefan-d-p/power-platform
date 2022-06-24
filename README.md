@@ -1,2 +1,5 @@
-# power-platform
-Various Microsoft Power related things
+
+
+# Links
+
+* [Microsoft Power Platform Connectors GitHub Repository](https://github.com/Microsoft/PowerPlatformConnectors)
