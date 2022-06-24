@@ -1,6 +1,6 @@
 This repository contains various Microsoft Power Platform related items
 
-* [DeepL Translate Custom Connector]
+* [DeepL Translate Custom Connector](https://github.com/stefan-d-p/power-platform/tree/main/DeepL)
 
 
 # Links
