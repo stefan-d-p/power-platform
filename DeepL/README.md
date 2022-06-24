@@ -41,4 +41,12 @@ The connection item requires your DeepL Authentication Key. You can retrieve you
 
 # Getting started
 
+* Download the apiDefinition.swagger.json
+* Add a new custom connector and select import from OpenAPI
+* Provide an Icon and background color for the connector
+* Click **Create Connector**
+
+> The apiDefinition.swagger.json points to the paid DeepL endpoint. To use the free plan api endpoint change the host entry to api-free.deepl.com.
+> DeepL uses form-urlencoded and multipart requests. Although you can view all actions in the visual connector designer you are not able to test requests here. You have to create a flow to test the connector operations.
+
 Visit the official [DeepL API documentation](https://www.deepl.com/docs-api) for further details on the various actions and parameters.
