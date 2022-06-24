@@ -1,0 +1,439 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "DeepL Translate API",
+      "version": "2.0",
+      "description": "This is a community swagger description of the DeepL API."
+    },
+    "host": "api.deepl.com",
+    "basePath": "/v2",
+    "schemes": [
+      "https"
+    ],
+    "paths": {
+      "/languages": {
+        "get": {
+          "description": "Get supported languages for either source or target",
+          "summary": "Get Supported Languages",
+          "x-ms-summary": "Get Supported Languages",
+          "x-ms-visibility": "internal",
+          "operationId": "GetLanguages",
+          "parameters": [
+            {
+              "name": "type",
+              "in": "query",
+              "description": "Sets whether source or target languages should be listed",
+              "x-ms-summary": "Type",
+              "required": false,
+              "enum": [
+                "source",
+                "target"
+              ],
+              "default": "target",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success",
+              "schema": {
+                "type": "array",
+                "description": "Languages",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "language": {
+                      "type": "string",
+                      "x-ms-summary": "Language",
+                      "description": "The language code of the given language."
+                    },
+                    "name": {
+                      "type": "string",
+                      "x-ms-summary": "Name",
+                      "description": "Name of the language in English."
+                    }
+                  }
+                }
+              }
+            },
+            "default": {
+              "description": "Operation failed",
+              "schema": {
+                "$ref": "#/definitions/errorResponse"
+              }
+            }
+          }
+        }
+      },
+      "/translate" :{
+        "post": {
+          "description": "Translate text to a target language",
+          "summary": "Translate Text",
+          "operationId": "TranslateText",
+          "consumes":[
+            "application/x-www-form-urlencoded"
+          ],
+          "produces":[
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "name": "text",
+              "in": "formData",
+              "description": "The text to translate",
+              "x-ms-summary": "Text",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "name": "target_lang",
+              "in": "formData",
+              "description": "The language into which the text should be translated",
+              "x-ms-summary": "Target Language",
+              "required": true,
+              "type": "string",
+              "x-ms-dynamic-values": {
+                "operationId": "GetLanguages",
+                "parameters": {
+                  "type": "target"
+                },
+                "value-path": "language",
+                "value-title": "name"
+              }
+            },
+            {
+              "name": "source_lang",
+              "in": "formData",
+              "description": "Language of the text to be translated",
+              "x-ms-summary": "Source Language",
+              "required": false,
+              "type": "string",
+              "x-ms-visibility": "advanced",
+              "x-ms-dynamic-values": {
+                "operationId": "GetLanguages",
+                "parameters": {
+                  "type": "source"
+                },
+                "value-path": "language",
+                "value-title": "name"
+              }
+            },
+            {
+              "name": "split_sentences",
+              "in": "formData",
+              "description": "Sets whether the translation engine should first split the input into sentences.",
+              "x-ms-summary": "Split Sentences",
+              "required": false,
+              "type": "string",
+              "enum": [
+                "0",
+                "1",
+                "nonewlines"
+              ],
+              "default": "1",
+              "x-ms-visibility": "advanced"
+            },
+            {
+              "name": "preserve_formatting",
+              "in": "formData",
+              "description": "Sets whether the translation engine should respect the original formatting, even if it would usually correct some aspects.",
+              "x-ms-summary": "Preserve Formatting",
+              "required": false,
+              "type": "string",
+              "enum": [
+                "0",
+                "1"
+              ],
+              "default": "0",
+              "x-ms-visibility": "advanced"
+            },
+            {
+              "name": "tag_handling",
+              "in": "formData",
+              "description": "Set tag handling for xml or html content",
+              "x-ms-summary": "Tag Handling",
+              "required": false,
+              "type": "string",
+              "enum": [
+                "xml",
+                "html"
+              ],
+              "x-ms-visibility": "advanced"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success",
+              "schema": {
+                "type":"object",
+                "properties": {
+                  "translations":{
+                    "type":"array",
+                    "description": "List of translation results",
+                    "x-ms-summary": "Translations (List)",
+                    "items": {
+                      "type":"object",
+                      "properties": {
+                        "detected_source_language": {
+                          "type":"string",
+                          "x-ms-summary": "Detected Source Language",
+                          "description": "The language of the text detected by DeepL"
+                        },
+                        "text": {
+                          "type": "string",
+                          "x-ms-summary": "Translated Text",
+                          "description": "The translated text"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "default": {
+              "description": "Operation failed",
+              "schema": {
+                "$ref": "#/definitions/errorResponse"
+              }
+            }
+          }
+        }
+      },
+      "/document/{document_id}/result": {
+        "post": {
+          "description": "Download translated document",
+          "summary": "Download Document",
+          "operationId": "DownloadTranslatedDocument",
+          "consumes": [
+            "application/x-www-form-urlencoded"
+          ],
+          "produces": [
+            "application/json",
+            "application/octet-stream"
+          ],
+          "parameters": [
+            {
+              "name": "document_id",
+              "in": "path",
+              "description": "DocumentId received when submitting translation request",
+              "x-ms-summary": "Document ID",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "name": "document_key",
+              "in": "formData",
+              "description": "Document Key received when submitting translation request",
+              "x-ms-summary": "Document Key",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success",
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "description": "Result binary data file",
+                "x-ms-summary": "Translated Document"
+              }
+            },
+            "default": {
+              "description": "Operation failed",
+              "schema": {
+                "$ref": "#/definitions/errorResponse"
+              }
+            }
+          }
+        }
+      },
+      "/document/{document_id}": {
+        "post": {
+          "description": "Check document translation status",
+          "summary": "Document Status",
+          "operationId": "CheckDocumentTranslationStatus",
+          "consumes": [
+            "application/x-www-form-urlencoded"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "name": "document_id",
+              "in": "path",
+              "description": "DocumentId received when submitting translation request",
+              "x-ms-summary": "Document ID",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "name": "document_key",
+              "in": "formData",
+              "description": "Document key received when submitting translation request",
+              "x-ms-summary": "Document Key",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success",
+              "schema": {
+                "type": "object",
+                "description": "Success response when checking status of a document translation request.",
+                "properties": {
+                  "document_id": {
+                    "type": "string",
+                    "x-ms-summary": "Document ID",
+                    "description": "Document Id of the translation request"
+                  },
+                  "status": {
+                    "type": "string",
+                    "x-ms-summary": "Status",
+                    "description": "Status of the translation request. Can be queued, translating, done or error"
+                  },
+                  "seconds_remaining": {
+                    "type": "integer",
+                    "x-ms-summary": "Remaining (Seconds)",
+                    "description": "Estimated number of seconds until the translation is done. This parameter is only included while the translation is ongoing."
+                  }
+                }
+              }
+            },
+            "default": {
+              "description": "Operation failed",
+              "schema": {
+                "$ref": "#/definitions/errorResponse"
+              }
+            }
+          }
+        }
+      },
+      "/document": {
+        "post": {
+          "description": "Translate a document",
+          "summary": "Upload document",
+          "operationId": "TranslateDocumentRequest",
+          "consumes": [
+            "multipart/form-data"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "name": "target_lang",
+              "in": "formData",
+              "description": "The language into which the text should be translated",
+              "x-ms-summary": "Target Language",
+              "required": true,
+              "type": "string",
+              "x-ms-dynamic-values": {
+                "operationId": "GetLanguages",
+                "parameters": {
+                  "type": "target"
+                },
+                "value-path": "language",
+                "value-title": "name"
+              }
+            },
+            {
+              "name": "file",
+              "in": "formData",
+              "description": "The document file to be translated",
+              "x-ms-summary": "Document File Data",
+              "required": true,
+              "type": "file",
+              "format": "binary"
+            },
+            {
+              "name": "source_lang",
+              "in": "formData",
+              "description": "(optional) source language of the document",
+              "x-ms-summary": "Source Language",
+              "x-ms-visibility": "advanced",
+              "required": false,
+              "type": "string",
+              "x-ms-dynamic-values": {
+                "operationId": "GetLanguages",
+                "parameters": {
+                  "type": "source"
+                },
+                "value-path": "language",
+                "value-title": "name"
+              }
+            },
+            {
+              "name": "formality",
+              "in": "formData",
+              "description": "Set whether the translated text should lean towards formal or informal language.",
+              "x-ms-summary": "Formality",
+              "x-ms-visibility": "advanced",
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success",
+              "schema": {
+                "type": "object",
+                "description": "Success response after submitting a document to DeepL API. Returns document id and key to check processing state.",
+                "properties": {
+                  "document_id": {
+                    "type": "string",
+                    "description": "A unique ID assigned to the uploaded document and the translation process. Must be used when referring to this particular document in subsequent API requests.",
+                    "x-ms-summary": "Document ID"
+                  },
+                  "document_key": {
+                    "type": "string",
+                    "description": "A unique key that is used to encrypt the uploaded document as well as the resulting translation on the server side. Must be provided with every subsequent API request regarding this particular document.",
+                    "x-ms-summary": "Document Key"
+                  }
+                }
+              }
+            },
+            "default": {
+              "description": "Bad Request",
+              "schema": {
+                "$ref": "#/definitions/errorResponse"
+              }
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "errorResponse": {
+        "type": "object",
+        "description": "DeepL Error",
+        "properties": {
+          "message": {
+            "type": "string",
+            "x-ms-summary": "Error Messsage",
+            "description": "Error message"
+          },
+          "detail": {
+            "type": "string",
+            "x-ms-summary": "Error Detail",
+            "description": "More detailed error message"
+          }
+        }
+      }
+    },
+    "securityDefinitions": {
+      "auth_key": {
+        "name": "auth_key",
+        "type": "apiKey",
+        "in": "query",
+        "description": "Authorization key from your DeepL account"
+      }
+    },
+    "security": [
+      {
+        "auth_key": []
+      }
+    ]
+  }
