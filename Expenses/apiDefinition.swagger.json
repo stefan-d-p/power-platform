@@ -1,0 +1,422 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "Expenses",
+      "description": "Sample swagger definition for OutSystems Expense Demo application",
+      "version": "1"
+    },
+    "host": "spatium.outsystemscloud.com",
+    "basePath": "/PowerAutomateExpensesAPI/rest/Expenses",
+    "schemes": [
+      "https"
+    ],
+    "consumes": [],
+    "produces": [],
+    "paths": {
+      "/Callback": {
+        "x-ms-notification-content": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "specversion": {
+                "type": "string",
+                "description": "specversion",
+                "x-ms-summary": "Specification Version"
+              },
+              "type": {
+                "type": "string",
+                "description": "type",
+                "x-ms-summary": "Event Type"
+              },
+              "source": {
+                "type": "string",
+                "description": "source",
+                "x-ms-summary": "Source"
+              },
+              "subject": {
+                "type": "string",
+                "description": "subject",
+                "x-ms-summary": "Subject"
+              },
+              "id": {
+                "type": "string",
+                "description": "Unique Identifier of event",
+                "x-ms-summary": "Event Id"
+              },
+              "time": {
+                "type": "string",
+                "description": "Timestamp when this event was emitted",
+                "x-ms-summary": "Event Timestamp"
+              },
+              "data": {
+                "type": "object",
+                "description": "Event Payload",
+                "x-ms-summary": "Event Data",
+                "properties": {
+                  "ExpenseId": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Unique Identifier of Expense Entry",
+                    "title": "ExpenseId",
+                    "x-ms-summary": "ExpenseId"
+                  }
+                }
+              }
+            }
+          },
+          "description": "Response"
+        },
+        "post": {
+          "x-ms-trigger": "single",
+          "summary": "When Expense added",
+          "description": "Triggers when a new expense entry is added",
+          "operationId": "ExpenseCreated",
+          "parameters": [
+            {
+              "name": "body",
+              "in": "body",
+              "required": false,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "TargetUrl": {
+                    "type": "string",
+                    "description": "TargetUrl",
+                    "x-ms-notification-url": true,
+                    "x-ms-visibility": "internal",
+                    "title": ""
+                  },
+                  "EventType": {
+                    "type": "string",
+                    "description": "EventType",
+                    "default": "Expense.Created",
+                    "x-ms-visibility": "internal"
+                  }
+                },
+                "required": [
+                  "TargetUrl", "EventType"
+                ]
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+                "description": "Webhook successfully registered"
+            }
+          }
+        }
+      },
+      "/Categories": {
+        "get": {
+          "tags": [
+            "Expenses"
+          ],
+          "description": "Retrieves all categories",
+          "operationId": "CategoriesGet",
+          "produces": [
+            "application/json"
+          ],
+          "responses": {
+            "200": {
+              "description": "List of available categories",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/Category_Result"
+                },
+                "description": "List of available categories"
+              }
+            }
+          },
+          "summary": "Get Expense Categories"
+        }
+      },
+      "/Categories/{CategoryId}": {
+        "get": {
+          "tags": [
+            "Expenses"
+          ],
+          "description": "Get details of a single category",
+          "operationId": "CategoryGet",
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "name": "CategoryId",
+              "in": "path",
+              "required": true,
+              "type": "integer",
+              "x-example": 1234567891234567,
+              "format": "int64",
+              "x-ms-dynamic-values": {
+                "operationId": "CategoriesGet",
+                "value-path": "CategoryId",
+                "value-title": "Title"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "",
+              "schema": {
+                "$ref": "#/definitions/Category_Result"
+              }
+            }
+          },
+          "summary": "Get Expense Category"
+        }
+      },
+      "/Expenses": {
+        "get": {
+          "tags": [
+            "Expenses"
+          ],
+          "description": "Get details of an expense",
+          "operationId": "ExpensesGet",
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "name": "filterCategory",
+              "in": "query",
+              "required": false,
+              "type": "integer",
+              "x-example": 1234567891234567,
+              "format": "int64",
+              "x-ms-dynamic-values": {
+                "operationId": "CategoriesGet",
+                "value-path": "CategoryId",
+                "value-title": "Title"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/Expense_Result"
+                }
+              }
+            }
+          },
+          "summary": "Get Expenses"
+        },
+        "post": {
+            "tags": [
+                "Expenses"
+            ],
+            "description": "Create an expense entry",
+            "summary": "Create Expense Entry",
+            "operationId": "ExpenseCreate",
+            "produces": [
+                "application/json"
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "name": "ExpenseEntry",
+                    "in":"body",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "SpentOn":{
+                                "type": "string",
+                                "format": "date",
+                                "description": "Date when the expense was spent",
+                                "title": "Spent On Date",
+                                "x-ms-summary": "Spent On"
+                            },
+                            "Title":{
+                                "type": "string",
+                                "description": "Title of the expense entry",
+                                "title": "Title",
+                                "x-ms-summary": "Title"
+                            },
+                            "CategoryId": {
+                                "type":"integer",
+                                "format": "int64",
+                                "description": "Category for this expense entry",
+                                "title": "Category Identifier",
+                                "x-ms-summary": "Category Identifier"
+                            },
+                            "Amount": {
+                                "type": "number",
+                                "description": "Amount spent",
+                                "title": "Amount",
+                                "x-ms-summary":"Amount"
+                            }
+                        }
+                    }
+                }
+            ],
+            "responses": {
+                "201":{
+                    "description": "Expense entry successfully created"
+                }
+            }
+        }
+      },
+      "/Expenses/{ExpenseId}": {
+        "get": {
+          "tags": [
+            "Expenses"
+          ],
+          "description": "Get details for a given expense id",
+          "operationId": "ExpenseGet",
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "name": "ExpenseId",
+              "in": "path",
+              "required": true,
+              "type": "integer",
+              "x-example": 1234567891234567,
+              "format": "int64"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "",
+              "schema": {
+                "$ref": "#/definitions/Expense_Result"
+              }
+            }
+          },
+          "summary": "Get Expense"
+        }
+      }
+    },
+    "definitions": {
+      "Callback_Delete": {
+        "description": "",
+        "type": "object",
+        "properties": {
+          "TargetUrl": {
+            "type": "string",
+            "default": "",
+            "description": "The webhook url"
+          }
+        },
+        "required": [
+          "TargetUrl"
+        ]
+      },
+      "Callback_Register": {
+        "description": "",
+        "type": "object",
+        "properties": {
+          "TargetUrl": {
+            "type": "string",
+            "default": "",
+            "description": "The webhook url"
+          },
+          "EventType": {
+            "type": "string",
+            "default": "",
+            "description": "The event type the webhook registers for"
+          }
+        },
+        "required": [
+          "TargetUrl",
+          "EventType"
+        ]
+      },
+      "Category_Result": {
+        "description": "",
+        "type": "object",
+        "properties": {
+          "CategoryId": {
+            "type": "integer",
+            "example": 1234567891234567,
+            "format": "int64"
+          },
+          "Title": {
+            "type": "string",
+            "default": ""
+          },
+          "TotalAmount": {
+            "type": "integer",
+            "example": 0,
+            "format": "int32"
+          }
+        }
+      },
+      "Expense_Result": {
+        "description": "",
+        "type": "object",
+        "properties": {
+          "ExpenseId": {
+            "type": "integer",
+            "example": 1234567891234567,
+            "format": "int64"
+          },
+          "SpentOn": {
+            "type": "string",
+            "format": "date",
+            "example": "2014-12-31",
+            "description": "Date when money spent"
+          },
+          "Title": {
+            "type": "string",
+            "default": "",
+            "description": "Short description of the expense entry"
+          },
+          "CategoryId": {
+            "type": "integer",
+            "example": 1234567891234567,
+            "format": "int64",
+            "description": "Single category on what type was spent"
+          },
+          "CategoryTitle": {
+            "type": "string",
+            "default": ""
+          },
+          "Amount": {
+            "type": "number",
+            "example": 0.1,
+            "description": "Amount spent"
+          },
+          "CreatedOn": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2014-12-31T23:59:59.938Z"
+          }
+        },
+        "required": [
+          "SpentOn",
+          "Title",
+          "CategoryId",
+          "Amount",
+          "CreatedOn"
+        ]
+      }
+    },
+    "parameters": {},
+    "responses": {},
+    "securityDefinitions": {
+      "basic_auth": {
+        "type": "basic"
+      }
+    },
+    "security": [
+      {
+        "basic_auth": []
+      }
+    ],
+    "tags": [
+      {
+        "name": "Expenses"
+      },
+      {
+        "name": "OutSystems"
+      }
+    ]
+  }
