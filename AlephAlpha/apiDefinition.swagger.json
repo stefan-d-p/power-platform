@@ -1,0 +1,271 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Aleph Alpha API",
+    "version": "2.0",
+    "description": "This is a community swagger description of Aleph Alpha API."
+  },
+  "host": "api.aleph-alpha.com",
+  "basePath": "/",
+  "schemes": ["https"],
+  "paths": {
+    "/version": {
+      "get": {
+        "description": "Get API Version",
+        "summary": "Get current API version",
+        "x-ms-summary": "Get current API version",
+        "operationId": "GetVersion",
+        "produces": ["text/plain"],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/users/me/tokens": {
+      "get": {
+        "description": "Get User Tokens",
+        "summary": "Get user tokens",
+        "x-ms-summary": "Get user tokens",
+        "operationId": "GetUserTokens",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "description": "List of API tokens that are registered for this user",
+              "x-ms-summary": "List of API tokens that are registered for this user",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "token_id": {
+                    "type": "integer",
+                    "description": "Token ID",
+                    "x-ms-summary": "Token ID"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Token description",
+                    "x-ms-summary": "Token description"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Operation failed",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create User Token",
+        "summary": "Create user token",
+        "x-ms-summary": "Create user token",
+        "operationId": "CreateUserToken",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "Token",
+            "x-ms-summary": "Token",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string",
+                  "description": "Token Description",
+                  "x-ms-summary": "Token Description"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "description": "Generated Token Result",
+              "x-ms-summary": "Generated Token Result",
+              "properties": {
+                "metadata": {
+                  "type": "object",
+                  "description": "Token Metadata",
+                  "x-ms-summary": "Token Metadata",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "description": "Token description",
+                      "x-ms-summary": "Token description"
+                    },
+                    "token_id": {
+                      "type": "integer",
+                      "description": "Token ID",
+                      "x-ms-summary": "Token ID"
+                    }
+                  }
+                },
+                "token": {
+                  "type": "string",
+                  "description": "Generated Token",
+                  "x-ms-summary": "Generated Token"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Operation failed",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete User Token",
+        "summary": "Delete user token",
+        "x-ms-summary": "Delete user token",
+        "operationId": "DeleteUserToken",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "token_id",
+            "in": "query",
+            "description": "Token ID",
+            "x-ms-summary": "Token ID",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "default": {
+            "description": "Operation failed",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/models_available": {
+      "get": {
+        "description": "Get Available Models",
+        "summary": "Get available models",
+        "x-ms-summary": "Get available models",
+        "operationId": "GetAvailableModels",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "description": "List of available models",
+              "x-ms-summary": "List of available models",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Model name",
+                    "x-ms-summary": "Model name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Model description",
+                    "x-ms-summary": "Model description"
+                  },
+                  "max_content_size": {
+                    "type": "integer",
+                    "description": "Maximum content size",
+                    "x-ms-summary": "Maximum content size"
+                  },
+                  "hostings": {
+                    "type": "array",
+                    "description": "List of hosting options",
+                    "x-ms-summary": "List of hosting options",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "image_support": {
+                    "type": "boolean",
+                    "description": "Image support",
+                    "x-ms-summary": "Image support"
+                  },
+                  "qa_support": {
+                    "type": "boolean",
+                    "description": "QA support",
+                    "x-ms-summary": "QA support"
+                  },
+                  "summarization_support": {
+                    "type": "boolean",
+                    "description": "Summarization support",
+                    "x-ms-summary": "Summarization support"
+                  },
+                  "embedding_types": {
+                    "type": "array",
+                    "description": "List of embedding types",
+                    "x-ms-summary": "List of embedding types",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "maximum_completion_tokens": {
+                    "type": "integer",
+                    "description": "Maximum completion tokens",
+                    "x-ms-summary": "Maximum completion tokens"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Operation failed",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "errorResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string",
+          "description": "Error message",
+          "x-ms-summary": "Error message"
+        },
+        "code": {
+          "type": "string",
+          "description": "Error code",
+          "x-ms-summary": "Error code"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "bearer_token": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Authorization Key from Aleph Alpha Profile page"
+    }
+  },
+  "security": [
+    {
+      "bearer_token": []
+    }
+  ]
+}
