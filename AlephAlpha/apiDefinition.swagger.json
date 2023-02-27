@@ -34,24 +34,7 @@
           "200": {
             "description": "Success",
             "schema": {
-              "type": "array",
-              "description": "List of API tokens that are registered for this user",
-              "x-ms-summary": "List of API tokens that are registered for this user",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "token_id": {
-                    "type": "integer",
-                    "description": "Token ID",
-                    "x-ms-summary": "Token ID"
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Token description",
-                    "x-ms-summary": "Token description"
-                  }
-                }
-              }
+              "$ref": "#/definitions/userTokensResponse"
             }
           },
           "default": {
@@ -76,6 +59,7 @@
             "required": true,
             "schema": {
               "type": "object",
+              "required": ["description"],
               "properties": {
                 "description": {
                   "type": "string",
@@ -90,33 +74,7 @@
           "200": {
             "description": "Success",
             "schema": {
-              "type": "object",
-              "description": "Generated Token Result",
-              "x-ms-summary": "Generated Token Result",
-              "properties": {
-                "metadata": {
-                  "type": "object",
-                  "description": "Token Metadata",
-                  "x-ms-summary": "Token Metadata",
-                  "properties": {
-                    "description": {
-                      "type": "string",
-                      "description": "Token description",
-                      "x-ms-summary": "Token description"
-                    },
-                    "token_id": {
-                      "type": "integer",
-                      "description": "Token ID",
-                      "x-ms-summary": "Token ID"
-                    }
-                  }
-                },
-                "token": {
-                  "type": "string",
-                  "description": "Generated Token",
-                  "x-ms-summary": "Generated Token"
-                }
-              }
+              "$ref": "#/definitions/generateTokenResponse"
             }
           },
           "default": {
@@ -236,6 +194,414 @@
           }
         }
       }
+    },
+    "/users/me": {
+      "get": {
+        "description": "Get User Settings",
+        "summary": "Get user settings",
+        "x-ms-summary": "Get user settings",
+        "operationId": "GetUserSettings",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "description": "User Profile",
+              "x-ms-summary": "User Profile",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "User ID",
+                  "x-ms-summary": "User ID"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "User email",
+                  "x-ms-summary": "User email"
+                },
+                "credits_remaining": {
+                  "type": "integer",
+                  "description": "Remaining credits",
+                  "x-ms-summary": "Remaining credits"
+                },
+                "invoice_allowed": {
+                  "type": "boolean",
+                  "description": "Is this user post-paid",
+                  "x-ms-summary": "Is this user post-paid"
+                },
+                "out_of_credits_threshold": {
+                  "type": "integer",
+                  "description": "Threshold for out-of-credits notification. If the threshold gets crossed with a task, then we trigger an email.",
+                  "x-ms-summary": "Out of credits threshold"
+                },
+                "terms_of_service_version": {
+                  "type": "string",
+                  "description": "Version string of the terms of service that the user has accepted",
+                  "x-ms-summary": "Terms of Service version"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Operation failed",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Update User Settings",
+        "summary": "Update user settings",
+        "x-ms-summary": "Update user settings",
+        "operationId": "UpdateUserSettings",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "Profile",
+            "in": "body",
+            "description": "User Profile",
+            "x-ms-summary": "User Profile",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["out_of_credits_threshold"],
+              "properties": {
+                "out_of_credits_threshold": {
+                  "type": "integer",
+                  "description": "Threshold for out-of-credits notification. If the threshold gets crossed with a task, then we trigger an email.",
+                  "x-ms-summary": "Out of credits threshold"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "default": {
+            "description": "Operation failed",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/summarize": {
+      "post": {
+        "description": "Will summarize a document using a specific model",
+        "x-ms-summary": "Will summarize a document using a specific model",
+        "summary": "Summarize document",
+        "operationId": "SummarizeDocument",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "nice",
+            "in": "query",
+            "type": "boolean",
+            "description": "Setting this to True, will signal to the API that you intend to be nice to other users by de-prioritizing your request below concurrent ones.",
+            "x-ms-summary": "Nice processing",
+            "required": false,
+            "default": true
+          },
+          {
+            "name": "Summarize",
+            "description": "Summarize request",
+            "x-ms-summary": "Summarize request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/summarizeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/summarizeResponse"
+            }
+          },
+          "default": {
+            "description": "Operation failed",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/complete": {
+      "post": {
+        "description": "Will complete a prompt using a specific model.",
+        "summary": "Complete a prompt",
+        "x-ms-summary": "Complete a prompt",
+        "operationId": "CompletePrompt",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "nice",
+            "in": "query",
+            "type": "boolean",
+            "description": "Setting this to True, will signal to the API that you intend to be nice to other users by de-prioritizing your request below concurrent ones.",
+            "x-ms-summary": "Nice processing",
+            "required": false,
+            "default": true
+          },
+          {
+            "name": "Completion",
+            "description": "Completion request",
+            "x-ms-summary": "Completion request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["model", "maximum_tokens"],
+              "properties": {
+                "model": {
+                  "type": "string",
+                  "description": "Model name",
+                  "x-ms-summary": "Model name",
+                  "x-ms-dynamic-values": {
+                    "operationId": "GetAvailableModels",
+                    "value-path": "name",
+                    "value-title": "name"
+                  }
+                },
+                "hosting": {
+                  "type": "string",
+                  "description": "Datacenter hosting the model",
+                  "x-ms-summary": "Datacenter",
+                  "x-ms-visibility": "advanced"
+                },
+                "maximum_tokens": {
+                  "type": "integer",
+                  "description": "Maximum tokens",
+                  "x-ms-summary": "Maximum tokens",
+                  "default": 64
+                },
+                "minimum_tokens": {
+                  "type": "integer",
+                  "description": "Minimum tokens",
+                  "x-ms-summary": "Minimum tokens",
+                  "x-ms-visibility": "advanced"
+                },
+                "echo": {
+                  "type": "boolean",
+                  "description": "Echo the prompt in the completion",
+                  "x-ms-summary": "Echo Prompt",
+                  "default": true
+                },
+                "temperature": {
+                  "type": "number",
+                  "description": "A higher sampling temperature encourages the model to produce less probable outputs",
+                  "x-ms-summary": "Temperature",
+                  "minimum": 0.0,
+                  "maximum": 1.0,
+                  "x-ms-visibility": "advanced"
+                },
+                "top_k": {
+                  "type": "integer",
+                  "description": "Introduces random sampling for generated tokens by randomly selecting the next token from the k most likely options",
+                  "x-ms-summary": "Random Sampling k",
+                  "minimum": 1,
+                  "x-ms-visibility": "advanced"
+                },
+                "top_p": {
+                  "type": "number",
+                  "description": "Introduces random sampling for generated tokens by randomly selecting the next token from the smallest possible set of tokens whose cumulative probability exceeds the probability top_p",
+                  "x-ms-summary": "Random Sampling p",
+                  "minimum": 0.0,
+                  "maximum": 1.0,
+                  "x-ms-visibility": "advanced"
+                },
+                "presence_penalty": {
+                  "type": "number",
+                  "description": "A penalty to apply if the model generates a token that has already been generated",
+                  "x-ms-summary": "Presence Penalty",
+                  "minimum": 0.0,
+                  "maximum": 1.0,
+                  "x-ms-visibility": "advanced"
+                },
+                "frequence_penalty": {
+                  "type": "number",
+                  "description": "A penalty to apply if the model generates a token that has already been generated",
+                  "x-ms-summary": "Frequency Penalty",
+                  "minimum": 0.0,
+                  "maximum": 1.0,
+                  "x-ms-visibility": "advanced"
+                },
+                "sequence_penalty": {
+                  "type": "number",
+                  "description": "Increasing the sequence penalty reduces the likelihood of reproducing token sequences that already appear in the prompt",
+                  "x-ms-summary": "Sequence Penalty",
+                  "x-ms-visibility": "advanced"
+                },
+                "sequence_penalty_min_length": {
+                  "type": "integer",
+                  "description": "Minimal number of tokens to be considered as sequence",
+                  "x-ms-summary": "Minimum Tokens Sequence Penalty",
+                  "default": 2,
+                  "x-ms-visibility": "advanced"
+                },
+                "repetition_penalties_include_prompt": {
+                  "type": "boolean",
+                  "description": "Flag deciding whether presence penalty or frequency penalty are updated from tokens in the prompt",
+                  "x-ms-summary": "Repetion Penalty Include Prompt",
+                  "default": false,
+                  "x-ms-visibility": "advanced"
+                },
+                "repetition_penalties_include_completion": {
+                  "type": "boolean",
+                  "description": "Flag deciding whether presence penalty or frequency penalty are updated from tokens in the completion",
+                  "x-ms-summary": "Repetion Penalty Include Completion",
+                  "default": true,
+                  "x-ms-visibility": "advanced"
+                },
+                "use_multiplicative_presence_penalty": {
+                  "type": "boolean",
+                  "description": "Flag deciding whether presence penalty is applied multiplicatively (True) or additively (False).",
+                  "x-ms-summary": "Use Multiplicative Presence Penalty",
+                  "default": true,
+                  "x-ms-visibility": "advanced"
+                },
+                "use_multiplicative_frequency_penalty": {
+                  "type": "boolean",
+                  "description": "Flag deciding whether frequency penalty is applied multiplicatively (True) or additively (False).",
+                  "x-ms-summary": "Use Multiplicative Frequency Penalty",
+                  "default": false,
+                  "x-ms-visibility": "advanced"
+                },
+                "use_multiplicative_sequence_penalty": {
+                  "type": "boolean",
+                  "description": "Flag deciding whether sequence penalty is applied multiplicatively (True) or additively (False).",
+                  "x-ms-summary": "Use Multiplicative Sequence Penalty",
+                  "default": false,
+                  "x-ms-visibility": "advanced"
+                },
+                "penalty_bias": {
+                  "type": "string",
+                  "description": "All tokens in this text will be used in addition to the already penalized tokens for repetition penalties",
+                  "x-ms-summary": "Penalty Bias",
+                  "x-ms-visibility": "advanced"
+                },
+                "penalty_exceptions": {
+                  "type": "array",
+                  "description": "List of strings that may be generated without penalty, regardless of other penalty settings",
+                  "x-ms-summary": "Penalty Exceptions",
+                  "x-ms-visibility": "advanced",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "penalty_exceptions_include_stop_sequences": {
+                  "type": "boolean",
+                  "description": "By default we include all stop_sequences in penalty_exceptions, so as not to penalise the presence of stop sequences that are present in few-shot prompts to give structure to your completions.",
+                  "x-ms-summary": "Penalty Exceptions Include Stop Sequences",
+                  "default": true,
+                  "x-ms-visibility": "advanced"
+                },
+                "best_of": {
+                  "type": "integer",
+                  "description": "Number of completions to return",
+                  "x-ms-summary": "Number of completions to return",
+                  "x-ms-visibility": "advanced"
+                },
+                "n": {
+                  "type": "integer",
+                  "description": "The number of completions to return",
+                  "x-ms-summary": "The number of completions to return",
+                  "default": 1,
+                  "x-ms-visibility": "advanced"
+                },
+                "log_probs": {
+                  "type": "integer",
+                  "description": "Number of top log probabilities for each token generated. Log probabilities can be used in downstream tasks or to assess the model's certainty when producing tokens",
+                  "x-ms-summary": "Log Probs",
+                  "default": 0,
+                  "x-ms-visibility": "advanced"
+                },
+                "stop_sequences": {
+                  "type": "array",
+                  "description": "List of strings that will stop generation if they're generated. Stop sequences may be helpful in structured texts.",
+                  "x-ms-summary": "Stop Sequences",
+                  "x-ms-visibility": "advanced",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "tokens": {
+                  "type": "boolean",
+                  "description": "Flag indicating whether individual tokens of the completion should be returned (True) or whether solely the generated text (i.e. the completion) is sufficient (False).",
+                  "x-ms-summary": "Tokens",
+                  "default": false,
+                  "x-ms-visibility": "advanced"
+                },
+                "raw_completion": {
+                  "type": "boolean",
+                  "description": "Setting this parameter to true forces the raw completion of the model to be returned",
+                  "x-ms-summary": "Raw Completion",
+                  "default": false,
+                  "x-ms-visibility": "advanced"
+                },
+                "disable_optimizations": {
+                  "type": "boolean",
+                  "description": "We continually research optimal ways to work with our models. By default, we apply these optimizations to both your prompt and completion for you",
+                  "x-ms-summary": "Disable Optimizations",
+                  "default": false,
+                  "x-ms-visibility": "advanced"
+                },
+                "completion_bias_inclusion": {
+                  "type": "array",
+                  "description": "Bias the completion to only generate options within this list; all other tokens are disregarded at sampling",
+                  "x-ms-summary": "Completion Bias Inclusion",
+                  "x-ms-visibility": "advanced",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "completion_bias_exclusion_first_token_only": {
+                  "type": "boolean",
+                  "description": "Only consider the first token for the completion_bias_exclusion",
+                  "x-ms-summary": "Completion Bias Exclusion First Token Only",
+                  "default": false,
+                  "x-ms-visibility": "advanced"
+                },
+                "contextual_control_threshold": {
+                  "type": "number",
+                  "description": "If set to null, attention control parameters only apply to those tokens that have explicitly been set in the request. If set to a non-null value, we apply the control parameters to similar tokens as well",
+                  "x-ms-summary": "Contextual Control Threshold",
+                  "x-ms-visibility": "advanced"
+                },
+                "control_log_additive": {
+                  "type": "boolean",
+                  "description": "true: apply controls on prompt items by adding the log(control_factor) to attention scores. false: apply ontrols on prompt items by (attention_scores - -attention_scores.min(-1)) * control_factor",
+                  "x-ms-summary": "Control Log Additive",
+                  "default": true,
+                  "x-ms-visibility": "advanced"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/completionResponse"
+            }
+          },
+          "default": {
+            "description": "Operation failed",
+            "schema": {
+              "$ref": "#/definitions/errorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -253,6 +619,158 @@
           "x-ms-summary": "Error code"
         }
       }
+    },
+    "userTokensResponse": {
+      "type": "array",
+      "description": "List of API tokens that are registered for this user",
+      "x-ms-summary": "API Token List",
+      "items": {
+        "type": "object",
+        "properties": {
+          "token_id": {
+            "type": "integer",
+            "description": "Token ID",
+            "x-ms-summary": "ID"
+          },
+          "description": {
+            "type": "string",
+            "description": "Token description",
+            "x-ms-summary": "Description"
+          }
+        }
+      }
+    },
+    "generateTokenResponse": {
+      "type": "object",
+      "description": "Generated Token Result",
+      "x-ms-summary": "Generated Token Result",
+      "properties": {
+        "metadata": {
+          "type": "object",
+          "description": "Token Metadata",
+          "x-ms-summary": "Metadata",
+          "properties": {
+            "description": {
+              "type": "string",
+              "description": "Token description",
+              "x-ms-summary": "Description"
+            },
+            "token_id": {
+              "type": "integer",
+              "description": "Token ID",
+              "x-ms-summary": "ID"
+            }
+          }
+        },
+        "token": {
+          "type": "string",
+          "description": "Generated Token",
+          "x-ms-summary": "Token"
+        }
+      }
+    },
+    "completionResponse": {
+      "type": "object",
+      "properties": {
+        "model_version": {
+          "type": "string",
+          "description": "The version of the model that was used to generate the completion",
+          "x-ms-summary": "Model Version"
+        },
+        "completions": {
+          "type": "array",
+          "description": "List of completions",
+          "x-ms-summary": "Completions",
+          "items": {
+            "type": "object",
+            "properties": {
+              "completion": {
+                "type": "string",
+                "description": "generated completion on the basis of the prompt",
+                "x-ms-summary": "Completion"
+              },
+              "raw_completion": {
+                "type": "string",
+                "description": "For some models, we may optimize the completion that was generated by the model and return the optimized completion in the completion field of the CompletionResponse. The raw completion, if returned, will contain the un-optimized completion. Setting the parameter raw_completion in the CompletionRequest to true forces the raw completion of the model to be returned. Setting tokens to true or log_probs to any value will also trigger the raw completion to be returned.",
+                "x-ms-summary": "Raw Completion"
+              },
+              "completion_tokens": {
+                "type": "array",
+                "description": "completion split into tokens. This field is only returned if requested with the parameter tokens",
+                "x-ms-summary": "Completion Tokens",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "finish_reason": {
+                "type": "string",
+                "description": "reason for termination of generation. This may be a stop sequence or maximum number of tokens reached.",
+                "x-ms-summary": "Finish Reason"
+              }
+            }
+          }
+        }
+      }
+    },
+    "summarizeRequest": {
+      "type": "object",
+      "required": ["model"],
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Name of model to use. A model name refers to a model architecture (number of parameters among others). Always the latest version of model is used. The model output contains information as to the model version.",
+          "x-ms-summary": "Model Name",
+          "x-ms-dynamic-values": {
+            "operationId": "GetAvailableModels",
+            "value-path": "name",
+            "value-title": "name"
+          }
+        },
+        "hosting": {
+          "type": "string",
+          "description": "Optional paramter that specifies which datacenters may process the request. You can either set the parameter to aleph-alpha or omit it (defaulting to null).",
+          "x-ms-summary": "Hosting",
+          "enum": ["aleph-alpha", "null"]
+        },
+        "document": {
+          "type": "object",
+          "description": "Valid document formats for tasks like Q&A and Summarization",
+          "x-ms-summary": "Document",
+          "properties": {
+            "docx": {
+              "type": "string",
+              "description": "base64 encoded binary docx",
+              "x-ms-summary": "base64 encoded docx"
+            },
+            "text": {
+              "type": "string",
+              "description": "text to summarize",
+              "x-ms-summary": "Text"
+            }
+          }
+        },
+        "disable_optimizations": {
+          "type": "boolean",
+          "description": "We continually research optimal ways to work with our models. By default, we apply these optimizations to both your query, documents, and answers for you. Our goal is to improve your results while using our API. But you can always pass disable_optimizations: true and we will leave your document and summary untouched.",
+          "x-ms-summary": "Disable Optimizations",
+          "default": false
+        }
+      }
+    },
+    "summarizeResponse": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "generated summary",
+          "x-ms-summary": "Summary"
+        },
+        "model_version": {
+          "type": "string",
+          "description": "The version of the model that was used to generate the summary",
+          "x-ms-summary": "Model Version"
+        }
+      }
     }
   },
   "securityDefinitions": {
@@ -260,7 +778,7 @@
       "type": "apiKey",
       "name": "Authorization",
       "in": "header",
-      "description": "Authorization Key from Aleph Alpha Profile page"
+      "description": "Authorization Key from Aleph Alpha Profile page. Format 'Bearer: <Your Token>'"
     }
   },
   "security": [
