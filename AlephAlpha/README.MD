@@ -33,32 +33,12 @@ The current version only features a subset of the available endpoints. Current f
 
 ## Operations
 
-### CompletePrompt
-
-Will complete a prompt using a specific Luminous model
-
-### SummarizeDocument
-
-Will summarize a document using a specific Luminous model.
-
-### GetVersion
-
-Returns the current API version
-
-### GetUserTokens
-
-Returns all active tokens configured in the Aleph Alpha account page.
-
-### CreateUserToken
-
-Creates a new token
-
-### DeleteToken
-
-Deletes an existing token from the account
-
-### GetAvailableModels
-
-Returns all available Luminous models. This operation acts as a dynamic input for other operations.
+- `CompletePrompt`: Will complete a prompt using a specific Luminous model
+- `SummarizeDocument`: Will summarize a document using a specific Luminous model.
+- `GetVersion`: Returns the current API version
+- `GetUserTokens`: Returns all active tokens configured in the Aleph Alpha account page.
+- `CreateUserToken`: Creates a new token
+- `DeleteToken`: Deletes an existing token from the account
+- `GetAvailableModels`: Returns all available Luminous models. This operation acts as a dynamic input for other operations.
 
 ## FAQ
